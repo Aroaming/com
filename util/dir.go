@@ -58,7 +58,7 @@ func statDir(dirPath, recPath string, includeDir, isDIrOnly, followSymlinks bool
 			}
 			statList = append(statList, s...)
 		} else if !isDIrOnly {
-			statList = append(statList, s...)
+			statList = append(statList, relPath)
 		} else if followSymlinks && fi.Mode()&os.ModeSymlink != 0 {
 			link, err := os.Readlink(curPath)
 			if err != nil {
@@ -72,6 +72,7 @@ func statDir(dirPath, recPath string, includeDir, isDIrOnly, followSymlinks bool
 				if err != nil {
 					return nil, err
 				}
+				statList = append(statList, s...)
 			}
 		}
 	}
