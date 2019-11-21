@@ -2,6 +2,7 @@ package util
 
 import (
 	"net"
+	"regexp"
 )
 
 func GetMacAddrs() map[string]string {
@@ -18,4 +19,14 @@ func GetMacAddrs() map[string]string {
 		mapMacs[netInterface.Name] = netInterface.HardwareAddr.String()
 	}
 	return mapMacs
+}
+
+const macRule = "([A-Fa-f0-9]{2}[-,:]){5}[A-Fa-f0-9]{2}"
+
+func CheckMacaddr(mac string) bool {
+	match, err := regexp.MatchString(macRule, mac)
+	if err != nil {
+		return false
+	}
+	return match
 }
