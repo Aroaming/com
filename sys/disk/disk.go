@@ -1,6 +1,8 @@
 package disk
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -70,9 +72,10 @@ func deleteExtraSpace(s string) string {
 }
 
 type DiskStatus struct {
-	All  uint64 `json:"all"`
-	Used uint64 `json:"used"`
-	Free uint64 `json:"free"`
+	All   uint64 `json:"all"`
+	Used  uint64 `json:"used"`
+	Free  uint64 `json:"free"`
+	Avail uint64 `json:"avail"`
 }
 
 // disk usage of path/disk
@@ -85,5 +88,18 @@ func DiskUsage(path string) (disk DiskStatus) {
 	disk.All = fs.Blocks * uint64(fs.Bsize)
 	disk.Free = fs.Bfree * uint64(fs.Bsize)
 	disk.Used = disk.All - disk.Free
+	disk.Avail = fs.Bavail * uint64(fs.Bsize)
 	return
+}
+
+//文件目录大小
+func DirSizeB(path string) (int64, error) {
+	var size int64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			size += info.Size()
+		}
+		return err
+	})
+	return size, err
 }
