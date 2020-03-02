@@ -1,35 +1,25 @@
-// +build linux
 package disk
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"os/exec"
+	"strconv"
+	"strings"
 )
 
 const (
-	cmd = "df -k -T -t ext4 -t ext3 -t xfs -t zfs"
+	dfCmd = "df -k -T -t ext4 -t ext3 -t xfs -t zfs"
 )
 
-func init() {
-	cmd := exec.Command("bash", "-c", cmd)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		fmt.Println(err)
+func splitLine(line string) DiskInfo {
+	var disk DiskInfo
+	str := strings.Split(trimLine(line), " ")
+	if len(str) != 7 {
+		return disk
 	}
-	//read title
-	out.ReadString('\n')
-	for {
-		line, err := out.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				err = nil
-			}
-			break
-		}
-		disks = append(disks, splitLine(line))
-	}
+	disk.Name = str[0]
+	disk.Size, _ = strconv.Atoi(str[2])
+	disk.SizeUsed, _ = strconv.Atoi(str[3])
+	disk.SizeUnUsed, _ = strconv.Atoi(str[4])
+	disk.Proportion = str[5]
+	disk.MountPath = str[6]
+	return disk
 }
