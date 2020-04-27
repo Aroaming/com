@@ -29,5 +29,4 @@ func TestSS(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "123456", testRR.Room)
 	assert.Equal(t, "abcdef", testRR.User)
-
 }
